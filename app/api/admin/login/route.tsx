@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server"; import {makeSession,cookieName} from "@/lib/auth"; import crypto from "crypto";
+export async function POST(req:Request){const {username,password}=await req.json();const u=process.env.ADMIN_USERNAME||"",p=process.env.ADMIN_PASSWORD||"";const ok=username===u&&password===p;if(!ok)return NextResponse.json({error:"Invalid credentials"},{status:401});const res=NextResponse.json({success:true});res.cookies.set(cookieName,makeSession(),{httpOnly:true,secure:true,sameSite:"lax",path:"/",maxAge:86400});return res}
