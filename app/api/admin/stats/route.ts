@@ -1,0 +1,3 @@
+import {list} from "@vercel/blob"; import {NextResponse} from "next/server"; import {isAdmin} from "@/lib/auth";
+export async function GET(){if(!await isAdmin())return NextResponse.json({error:"Unauthorized"},{status:401});let all:any[]=[];let cursor:string|undefined;do{const r=await list({limit:1000,cursor});all.push(...r.blobs);cursor=r.cursor; if(!r.hasMore)break}while(cursor);
+ const total=all.reduce((s,b)=>s+b.size,0);return NextResponse.json({totalFiles:all.length,totalMB:+(total/1048576).toFixed(2),users:"N/A",newest:all.sort((a,b)=>+new Date(b.uploadedAt)-+new Date(a.uploadedAt)).slice(0,20).map(b=>({id:b.pathname,filename:b.pathname.split("/").pop(),sizeMB:+(b.size/1048576).toFixed(2),uploadedAt:b.uploadedAt}))})}
